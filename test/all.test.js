@@ -20,7 +20,14 @@ const pathIn = pathJoin(__dirname, 'files'),
 	pathOut = pathJoin(__dirname, 'filesOut');
 
 /* jshint expr: true */
-/* global describe, it */
+/* global describe, it, before */
+
+before(function(cb) {
+	fs.mkdir(pathOut, err => {
+		if (!err || err.code == 'EEXIST') return cb();
+		cb(err);
+	});
+});
 
 describe('Tests', function() {
 	it('check', function(cb) {
