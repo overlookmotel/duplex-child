@@ -8,52 +8,47 @@
 // Modules
 const chai = require('chai'),
 	{expect} = chai,
-	fs = require('fs'),
-	pathJoin = require('path').join,
 	DuplexChild = require('../lib/');
 
 // Init
 chai.config.includeStack = true;
 
 // Tests
-const pathIn = pathJoin(__dirname, 'files'),
-	pathOut = pathJoin(__dirname, 'filesOut');
 
 /* jshint expr: true */
-/* global describe, it, before */
-
-before(function(cb) {
-	fs.mkdir(pathOut, err => {
-		if (!err || err.code == 'EEXIST') return cb();
-		cb(err);
-	});
-});
+/* global describe, it */
 
 describe('Tests', function() {
-	it('check', function(cb) {
-		const filename = '100KB.txt';
+	it.skip('dummy', function() {
+		expect(DuplexChild).to.be.ok;
+	});
 
-		console.log(`test with file: ${filename}`);
+	it('check Readable', function(cb) {
+		const {Readable} = require('stream');
 
-		console.log('creating DuplexChild');
-		const cat = new DuplexChild();
-		console.log('spawning');
-		cat.spawn('cat');
-		console.log('spawned');
+		const stream = new Readable();
 
-		const input = fs.createReadStream(pathJoin(pathIn, filename)),
-			output = fs.createWriteStream(pathJoin(pathOut, filename));
+		let called = false,
+			calledTwice = false;
+		stream._read = function(size) {
+			console.log(`_read() called: ${size} bytes`);
 
-		console.log('piping input');
-		input.pipe(cat);
-		console.log('piped input');
+			if (called) {
+				calledTwice = true;
+				return this.push(null);
+			}
 
-		console.log('piping output');
-		cat.pipe(output);
-		console.log('piped output');
+			called = true;
 
-		expect(true).to.be.true;
+			const wantsMore = this.push(Buffer.alloc(1000, 'a'));
+			console.log(`wantsMore: ${wantsMore}`);
+		};
 
-		output.on('close', cb);
+		stream.resume();
+
+		stream.on('end', () => {
+			if (calledTwice) return cb(new Error('_read called again before .push returns false'));
+			cb();
+		});
 	});
 });
