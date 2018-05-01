@@ -22,33 +22,4 @@ describe('Tests', function() {
 	it.skip('dummy', function() {
 		expect(DuplexChild).to.be.ok;
 	});
-
-	it('check Readable', function(cb) {
-		const {Readable} = require('stream');
-
-		const stream = new Readable();
-
-		let called = false,
-			calledTwice = false;
-		stream._read = function(size) {
-			console.log(`_read() called: ${size} bytes`);
-
-			if (called) {
-				calledTwice = true;
-				return this.push(null);
-			}
-
-			called = true;
-
-			const wantsMore = this.push(Buffer.alloc(1000, 'a'));
-			console.log(`wantsMore: ${wantsMore}`);
-		};
-
-		stream.resume();
-
-		stream.on('end', () => {
-			if (calledTwice) return cb(new Error('_read called again before .push returns false'));
-			cb();
-		});
-	});
 });
