@@ -21,7 +21,8 @@
     "cross-env": "^5.1.4",
     "istanbul": "^0.4.5",
     "jshint": "^2.9.5",
-    "mocha": "^5.1.0"
+    "mocha": "^5.1.0",
+    "stream-gen": "^1.0.1"
   },
   "keywords": [
     "child",
